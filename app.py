@@ -237,8 +237,9 @@ def index():
 @app.route('/upload',  methods=['POST'])
 def upload_data():
     data = request.get_json()
-    print(data)
-    
+    with open("user.txt","a+",encoding="utf-8") as f:
+        f.write(str(data['message_list']))
+        f.write("\n")  
     return "ok"
 
 @app.route('/thank')
