@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head> 
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCKU MI2S</title>
+    <!-- bootstrap icons cdn-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- local style -->
+    <link href="/static/css/style2.css" rel="stylesheet" />
+    <style>
+        .outline {
+            background: #ccc;
+            border: 2px solid #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    {% raw %}
+
+    <div id="app">
+        <!-- 主畫面 -->
+        <div id="main-container" class="container-fulid
+                                    d-flex align-items-center justify-content-center">
+            <div id="main" class="container p-0 mx-xxl-5 
+                                    bg-light shadow rounded-3
+                                    d-flex flex-column">
+                <!-- 導覽列 -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-3">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="/">Bsrs-5 Chatbot</a>
+                        <button v-on:click="uploadData()" type="button" class="btn btn-primary">上傳資料</button>
+                    </div>
+                </nav>
+
+                <!-- 內容 -->
+                <div class="d-flex flex-fill">
+                    <!-- 聊天區 -->
+                    <div id="chat-box-container" class="container px-1">
+                        <!-- Message -->
+                        <div id="chat-box" class="bg-white rounded-3" ref="message_container">
+                            <div v-for="(item, mi) in message_list">
+
+                                <!-- User Message -->
+                                <template v-if="item.isUser">
+                                    <div class="d-flex align-items-center justify-content-end m-2">
+                                        <div class="bg-primary text-white m-1 px-2 py-1 rounded-2">
+                                            {{item.reply}}
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- Bot Message -->
+                                <template v-else-if="item.isText">
+                                    <div class="d-flex align-items-center justify-content-start m-2">
+                                        <img src="/static/images/userpics.png"
+                                            alt="user" width="40" class="rounded-circle">
+                                        <div class="bg-light m-1 px-2 py-1 rounded-2">
+                                            {{item.reply}}
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Typing area -->
+                        <div class="input-group">
+                            <input type="text" placeholder="Type a message" class="form-control bg-light border-0"
+                                v-model="input_message" v-on:keyup.enter="sendMessage()" />
+                            <button v-on:click="sendMessage()" class="btn btn-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-send-fill" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                        d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89.471-1.178-1.178.471L5.93 9.363l.338.215a.5.5 0 0 1 .154.154l.215.338 7.494-7.494Z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer" class="text-dark py-1">
+            <div class="container px-5">
+                <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+                    <div class="col-auto">
+                        <div class="small m-0">Bootstrapious &copy; NCKU MI2S 2023</div>
+                    </div>
+                    <div class="col-auto">
+                        <a class="link-dark small" href="https://wmmks.csie.ncku.edu.tw/">聯絡我們</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+
+    </script>
+    <!-- Bootstrap core JS cdn-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- Vue.js cdn -->
+    <script src="/static/js/vue.js"></script>
+    <!-- axios cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- local js -->
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data: {
+                // message
+                input_message: "",
+                message_list: [],
+                is_done: 0
+            },
+            created() {
+                // setting
+                // this.check_confirm = confirm("仍在開發階段，任何言論皆不代表本實驗室立場");
+                // message
+                this.initMessange();
+            },
+            methods: {
+                // messange
+                scrollToEnd() {
+                    let content = this.$refs.message_container;
+                    content.scrollTop = content.scrollHeight;
+                },
+                // init messange
+                initMessange() {
+                    this.message_list.push({
+                        "isUser": false,
+                        "isText": true,
+                        "reply": "您好，這裡是輔助診斷聊天機器人。等一下會詢問一些問題，請你回想近一個禮拜的狀況，並請你以直覺回答就可以了 !",
+                    });
+                    this.message_list.push({
+                        "isUser": false,
+                        "isText": true,
+                        "reply": "請問最近生活中有沒有遇到什麼困難?",
+                    });
+                },
+
+                // send message
+                async sendMessage() {
+                    await this.pushMessange();
+                    this.scrollToEnd();
+                    this.getReply();
+                    this.input_message = "";
+                },
+                // upload data
+                uploadData() {
+                    if (this.is_done == 1) {
+                        axios
+                            .post('/upload', {message_list : this.message_list})
+                            .then((response) => {
+                                alert("上傳完成");
+                                console.log(response)
+                                if (response.data == "ok"){
+                                    window.location.href = "/thank"
+                                }
+                            })
+                            .catch((error) => {
+                                alert(error)
+                            });     
+                    }
+                    else {
+                        alert("請完成問卷再進行上傳");
+                    }
+                },
+                pushMessange() {
+                    this.input_message = this.input_message.trim();
+                    if (this.input_message == "") return;
+                    if (this.is_done == 1) return;
+                    console.log("input message:", this.input_message);
+                    this.message_list.push({
+                        "isUser": true,
+                        "isText": true,
+                        "reply": this.input_message,
+                    });
+                },
+                getReply() {
+                    axios
+                        .post('/getReply', { input_message: this.input_message })
+                        .then((response) => {
+                            console.log("response data:", response.data);
+                            if (response.data["reply"] == "好的，我這邊大致了解狀況了。謝謝你今天的訪談。請按右上上傳資料進行問卷上傳。" && this.is_done == 0){
+                                this.is_done = 1;
+                                this.message_list.push(response.data);
+                            }
+                            if (response.data && this.is_done == 0)
+                            this.message_list.push(response.data);
+                        })
+                        .catch((error) => {
+                            alert(error)
+                        })
+                        .finally(() => {
+                            this.scrollToEnd();
+                        });
+                },
+
+            },
+        });
+    </script>
+
+    {% endraw %}
+
+</body>
+
+</html>
