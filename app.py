@@ -1,9 +1,14 @@
 # -*- coding: UTF-8 -*-
-import sys, os, time, json , random
+import os, json , random , time 
 import requests as req
-from flask import Flask, render_template, send_file, session , request, redirect , url_for
+from flask import Flask, jsonify, render_template, session , request, redirect , url_for
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from datetime import timedelta
+from utils import hts_synthesis_client, asr
+from datetime import datetime
+import glob
+import moviepy.editor as moviepy
 
 
 
@@ -201,7 +206,7 @@ def detectEvent(inputSentence):
                 return index
     return None
 
-def getNewUserInfo():
+def getNewUserInfo(account , tts , stt):
 
     steps = sorted(["q" + str(i) for i in range(1,12)],key= lambda k : random.random())
     steps.pop(steps.index("q4"))
@@ -210,7 +215,11 @@ def getNewUserInfo():
     steps.append("q6")
     steps.append("end")
 
-    return { "isFinishedQuestions" : {"event1" : False, "event2" : False , "event3" : False ,"chit":False, "q1":False,"q2":False,"q3":False,"q4":False,"q5":False,"q6":False,"q7":False,"q8":False,"q9":False,"q10":False,"q11":False,"end":False},
+    return { 
+             "account" : account,
+             "tts" : tts,
+             "stt" : stt,
+             "isFinishedQuestions" : {"event1" : False, "event2" : False , "event3" : False ,"chit":False, "q1":False,"q2":False,"q3":False,"q4":False,"q5":False,"q6":False,"q7":False,"q8":False,"q9":False,"q10":False,"q11":False,"end":False},
              "askingTimes" : {"event1" : 1 ,"event2": 1,"event3": 1,"chit" : 1 ,"q1": 2 ,"q2": 2 ,"q3": 2 ,"q4": 2 ,"q5": 2 ,"q6": 2 ,"q7": 1 ,"q8": 1 ,"q9": 1 ,"q10": 1 ,"q11": 1 ,"end": 1 },
              "potentialSymptoms" : [ [] for _ in range(6) ],
              "potentialEvents" : [],
@@ -219,19 +228,119 @@ def getNewUserInfo():
              "nowTimes" : 1
             }
     
+def validLogin(account, password):
+    if account == "123" and password == "123":
+        return True
+    else: 
+        False
+
+def getPreStepWord(preStep):
+    if preStep == "q1":
+        return "對於睡眠的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+    elif preStep == "q2":
+        return "對於緊張不安的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+    elif preStep == "q3":
+        return "對於苦惱或動怒的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+    elif preStep == "q4":
+        return "對於憂鬱心情低落的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+    elif preStep == "q5":
+        return "對於比不上別人的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+    elif preStep == "q6":
+        return "對於自殺念頭的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
+
+def getReply(account, sessionTts, reply, popup = "0", preStepWord = ""):
+
+    dirPath = f"./static/tts/{account}"
+    if sessionTts == "0":
+        return  {
+        "isUser": False,
+        "isText": True,
+        "reply": reply,
+        "ttsPath": "",
+        "popup": popup ,
+        "preStep": preStepWord
+        }
+    elif sessionTts == "1":
+        tts_client = hts_synthesis_client.TTSClient()
+        tts_client.set_language(language="chinese", model="M60")
+        ttsPath = tts_client.askForService(data = reply, dir_path= dirPath, file_name = datetime.now().strftime("%H%M%S") + ".wav")
+        return  {
+        "isUser": False,
+        "isText": True,
+        "reply": reply,
+        "ttsPath" : ttsPath,
+        "popup": popup ,
+        "preStep": preStepWord
+        }
+    elif sessionTts == "2":
+        tts_client = hts_synthesis_client.TTSClient()
+        tts_client.set_language(language="taiwanese_sandhi", model="M12")
+        ttsPath = tts_client.askForService(data = reply, dir_path= dirPath , file_name = datetime.now().strftime("%H%M%S") + ".wav") 
+        return  {
+        "isUser": False,
+        "isText": True,
+        "reply": reply,
+        "ttsPath" : ttsPath,
+        "popup": popup,
+        "preStep": preStepWord
+        }
+
+
+def clearCacheFile():
+    
+    try: # clear tts
+        account = session["user"]["account"]
+        
+        files = glob.glob(f"./static/tts/{account}/*")
+        for f in files:
+            os.remove(f)
+    except Exception as e:
+        print(e)
+    
+    try: # clear stt
+        account = session["user"]["account"]
+        
+        files = glob.glob(f"./static/stt/{account}/*")
+        for f in files:
+            os.remove(f)
+        session.clear()
+    except Exception as e:
+        print(e)
 
 
 
+    
 
-app = Flask(__name__)
+app = Flask(__name__,
+        static_folder="static", # 放置靜態物件的名稱
+        static_url_path="/static",)
 CORS(app)
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=10)
+app.config['UPLOAD_FOLDER'] = "./static/stt"
 app.secret_key = os.urandom(24)
 
 
-@app.route('/')
-def index():
-    session["user"] = getNewUserInfo()
+
+@app.route('/', methods = ["GET","POST"])
+def login():
+    if request.method == "GET":
+        clearCacheFile()
+        return render_template('login.html')
+    else:
+        account = request.form["account"]
+        password = request.form["password"]
+        stt = request.form["stt"]
+        tts = request.form["tts"]
+        success = validLogin(account,password)
+        if success:
+            session["user"] = getNewUserInfo(account,tts,stt)
+            return redirect(url_for("chatbot"),code=307) 
+        else:
+            return render_template('login.html')
+        
+
+@app.route('/chatbot' , methods = ["POST"])
+def chatbot():
     return render_template('index.html')
 
 @app.route('/upload',  methods=['POST'])
@@ -244,29 +353,54 @@ def upload_data():
 
 @app.route('/thank')
 def thank():
+    clearCacheFile()
     return render_template("thank.html")
+
+@app.route("/result", methods=["POST"])
+def result():
+
+    account = session["user"]["account"]
+    stt = session["user"]["stt"]
+    if stt == "0":
+        return ""
+    dirPath = f"./static/stt/{account}"
+    if not os.path.isdir(dirPath):
+        os.mkdir(dirPath)
+    audio_blob = request.files['data'] # <class 'werkzeug.datastructures.FileStorage'>
+
+    # TODO: is there any way to avoid saving wav file and read them again?
+    fname = str(time.time())[:14]
+    with open(f"{dirPath}/{fname}.webm", "wb") as _f:
+        audio_blob.save(_f)
+    
+    os.system(f"ffmpeg -loglevel error -y -i {dirPath}/{fname}.webm -ar 16000 -ac 1 {dirPath}/{fname}.wav")
+    time.sleep(0.5)
+    filePath = f"{dirPath}/{fname}.wav"
+    if stt == "1":
+        text = asr.stt_chinese(filePath)
+        return jsonify({"stt" : text})
+    elif stt == "2":
+        text = asr.stt_taiwanese(filePath)
+        return jsonify({"stt" : text})
+
+    return ""
+ 
 
 @app.route('/getReply', methods=['POST'])
 def query_news():
 
-    # print(session.get("user"))
-    # print("======================before==============================")
     data = request.get_json()
     userInput = data["input_message"]   
     if userInput == "":
-        return  {
-        "isUser": False,
-        "isText": True,
-        "reply": "請輸入文字",
-        }
+        return  getReply(session["user"]["account"], session["user"]["tts"], "請輸入文字")
     userCkip = json.loads(req.post("http://140.116.245.157:2001", data={"data":userInput, "token":TOKEN}).text) # json 格式
-    # print("preStep: " + str(session["user"]["preStep"]))
+    print("preStep: " + str(session["user"]["preStep"]))
     if session["user"]["nowTimes"] == session["user"]["askingTimes"][session["user"]["preStep"]]:
         session["user"]["nowTimes"] = 0
         session["user"]["isFinishedQuestions"][session["user"]["preStep"]] = True  
     nowQuestion = detectSentenceType(userCkip["ws"][0])
     eventId = detectEvent(userInput)
-    # print("eventId: " + str(eventId))
+    print("eventId: " + str(eventId))
     if eventId != None and (session["user"]["isFinishedQuestions"]["event1"] == False or session["user"]["isFinishedQuestions"]["event2"] == False or session["user"]["isFinishedQuestions"]["event3"] == False):
         if session["user"]["isFinishedQuestions"]["event1"] == False:
             session["user"]["potentialEvents"].append(eventId)
@@ -278,58 +412,40 @@ def query_news():
             session["user"]["potentialEvents"].append(eventId)
             nowQuestion = "event3"
 
-    if nowQuestion == "event1":
-        session["user"]["isFinishedQuestions"]["event1"] = True
-        return {
-        "isUser": False,
-        "isText": True,
-        "reply": eventSentences[eventId][0],
-        }
+    if nowQuestion.startswith("event"):
+        session["user"]["isFinishedQuestions"]["event" + nowQuestion[-1]] = True
+        session.modified = True
+        return getReply(session["user"]["account"], session["user"]["tts"], eventSentences[eventId][0])
     
-    if nowQuestion == "event2":
-        session["user"]["isFinishedQuestions"]["event2"] = True
-        return {
-        "isUser": False,
-        "isText": True,
-        "reply": eventSentences[eventId][0],
-        }
-    
-    if nowQuestion == "event3":
-        session["user"]["isFinishedQuestions"]["event3"] = True
-        return {
-        "isUser": False,
-        "isText": True,
-        "reply": eventSentences[eventId][0],
-        }
     
     if nowQuestion == "end":
         session["user"]["isFinishedQuestions"]["end"] = True
-        return {
-        "isUser": False,
-        "isText": True,
-        "reply": othersSentences[2][0],
-        }
-    # print("nowQuestion: " + str(nowQuestion))
+        session.modified = True
+        return getReply(session["user"]["account"], session["user"]["tts"], othersSentences[2][0])
+    
+    print("nowQuestion: " + str(nowQuestion))
 
     symptomsList = detectSymptom(userInput)
-    # print("symptomsList: " + str(symptomsList))
+    print("symptomsList: " + str(symptomsList))
 
     basicSentencesId = int(nowQuestion[1:])-1
-    # print("basicSentencesId: " + str(basicSentencesId + 1))
+    print("basicSentencesId: " + str(basicSentencesId + 1))
 
     if session["user"]["isFinishedQuestions"][session["user"]["preStep"]]:
         session["user"]["nowTimes"] += 1
+        preStepWord = getPreStepWord(session["user"]["preStep"])
+        ps = session["user"]["preStep"]
         # print("nowTimes: " + str(session["user"]["nowTimes"]))
         session["user"]["preStep"] = nowQuestion
         session.modified = True
         # print(session.get("user"))
         # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
         # print("================= IF =======================")
-        return {
-        "isUser": False,
-        "isText": True,
-        "reply": replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)],
-        }
+        if ps == "q1" or ps == "q2" or ps == "q3" or ps == "q4" or ps == "q5" or ps == "q6":
+            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)],"1",preStepWord)
+        else:
+            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)])
+    
     else:
         if session["user"]["nowTimes"] == 1:
             session["user"]["nowTimes"] += 1
@@ -339,11 +455,8 @@ def query_news():
             # print(session.get("user"))
             # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
             # print("==================ELSE IF======================")
-            return {
-            "isUser": False,
-            "isText": True,
-            "reply": intensitySentences[basicSentencesId][0],
-            }
+            return getReply(session["user"]["account"], session["user"]["tts"], intensitySentences[basicSentencesId][0])
+
         else:
             session["user"]["nowTimes"] += 1
             # print("nowTimes: " + str(session["user"]["nowTimes"]))
@@ -351,17 +464,13 @@ def query_news():
             session.modified = True
             # print(session.get("user"))
             # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
-            return {
-            "isUser": False,
-            "isText": True,
-            "reply": replyWords[random.randint(0,len(replyWords))] + basicSentences[basicSentencesId][random.randint(0,3)],
-            }
+            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords))] + basicSentences[basicSentencesId][random.randint(0,3)])
     
             
 
 if __name__ == '__main__':
 
-    app.run(host='0.0.0.0', port='8888',debug=True)
+    app.run(host='127.0.0.1', port='8888',debug=True)
     
     
 
