@@ -37,6 +37,7 @@
                     <div class="container-fluid">
                         <a class="navbar-brand" href="/">Bsrs-5 Chatbot</a>
                         <div>
+                            <button type="button" class="btn btn-primary" onclick="openPopup()">測試</button>
                             <button type="button" class="btn btn-primary" onclick="javascript:location.href='/'">重新填寫</button>
                             <button v-on:click="uploadData()" type="button" class="btn btn-primary">上傳資料</button>
                         </div>
@@ -75,7 +76,7 @@
 
                         <!-- Typing area -->
                         <div class="input-group">
-                            <button v-on:click="" class="record-btn" id="recorder">
+                            <button class="record-btn" id="recorder">
                                 record
                             </button>
                             <input id="inputArea" type="text" placeholder="Type a message" class="form-control bg-light border-0"
@@ -98,11 +99,11 @@
                                 <h2 id="symptomtext">對於嚴重程度請幫我拉取下面的拉霸條</h2>
                             </div>
                             <div class="intensityimg">
-                                <p style="font-size:50px">&#128518;</p>
-                                <p style="font-size:50px">&#128528;</p>
-                                <p style="font-size:50px">&#128529;</p>
-                                <p style="font-size:50px">&#128534;</p>
-                                <p style="font-size:50px">&#128545;</p>
+                                <p style="font-size:35px">&#128518;</p>
+                                <p style="font-size:35px">&#128528;</p>
+                                <p style="font-size:35px">&#128529;</p>
+                                <p style="font-size:35px">&#128534;</p>
+                                <p style="font-size:35px">&#128545;</p>
                             </div>
                             <div class="slider-wrapper">
                                 <input type="range" min="0" max="4" value="2" class="slider" id="myRange">
@@ -238,18 +239,31 @@
                 getReply() {
                     axios
                         .post('/getReply', { input_message: this.input_message })
-                        .then((response) => {
-                            if (response.data["popup"] == "1"){
-                                openPopup(response.data["preStep"]);
+                        .then(async (response) => {
+                            if (response.data["popup"] == "1"){  
+                                openPopup(response.data["preStep"]);                        
+                                if (response.data["ttsPath"] != ""){
+                                    this.audio.pause();
+                                    this.audio = new Audio(response.data["ttsPath"])
+                                    while(popup.classList.contains('open_popup')){
+                                        await sleep(2000);
+                                    }
+                                    this.audio.play()
+                                }
+                            }else{
+                                if (response.data["ttsPath"] != ""){
+                                    this.audio.pause()
+                                    this.audio = new Audio(response.data["ttsPath"])
+                                    this.audio.play()
+                                }
                             }
-                            if (response.data["ttsPath"] != ""){
-                                this.audio.pause()
-                                this.audio = new Audio(response.data["ttsPath"])
-                                this.audio.play()
-                            }
+                            
                             console.log("response data:", response.data);
                             if (response.data["reply"] == "好的，我這邊大致了解狀況了。謝謝你今天的訪談。請按右上上傳資料進行問卷上傳。" && this.is_done == 0){
                                 this.is_done = 1;
+                                sendMessage.setAttribute("disabled","disabled");
+                                recorder.setAttribute("disabled","disabled");
+                                inputArea.setAttribute("disabled","disabled");
                                 this.message_list.push(response.data);
                             }
                             if (response.data && this.is_done == 0)
@@ -272,6 +286,10 @@
         let slider = document.getElementById("myRange");
         let sendMessage = document.getElementById("sendMessage");
         let recorder = document.getElementById("recorder");
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
         function openPopup(text) {
             symptomtext.innerHTML = text;

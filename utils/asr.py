@@ -18,21 +18,21 @@ def stt_taiwanese(filePath):
     lang (must-have) (mandarin - 國語 / taiwanese - 台語)
     model (optional) 如不設定，將值設定成空字串
     '''
-    data = {
-        "token": "XXX",
+    datas = {
+        "token": "@@@bsrs@@@",
         "lang": "taiwanese",  # mandarin taiwanese
-        "model": "",  # mandarin taiwanese
+        "model_name": "TA_BSRS",  # mandarin taiwanese
         "audio_data": enc.decode('utf-8'),
-        "audio_name": "Temporary"
+        "source": "P"
     }
 
-    r = requests.post('http://140.116.245.157:9500/asr', json=data)
+    r = requests.post('http://140.116.245.149:2802/asr', data=datas)
 
     # test
     # print(r.json().keys())
     # print(r.json()['status']) # True or False
     # print(r.json()['msg'])
     # print(r.json()['hyps'])
-
-    return r.json()['hyps']['result']
+    print(r.json())
+    return r.json()['words'][0]
 

@@ -2,7 +2,6 @@
 import os, json , random , time 
 import requests as req
 from flask import Flask, jsonify, render_template, session , request, redirect , url_for
-from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from datetime import timedelta
 from utils import hts_synthesis_client, asr
@@ -82,9 +81,9 @@ basicSentences = [
 
 intensitySentences = [
     ["那你的睡眠品質從0到4分，0分代表完全沒有問題，4分代表有很嚴重的睡眠問題，你會給自己多少分呢?"],
-    ["如果要你給出0到4分的分數，0分代表完全沒有緊張不安，1分代表輕微緊張不安，以此類推，4分代表總是緊張不安。這樣的話你會給自己幾分?"],
+    ["如果要你給出0到4分的分數，0分代表沒有緊張不安，1分代表輕微緊張不安，以此類推，4分代表總是緊張不安。這樣的話你會給自己幾分?"],
     ["那你覺得苦惱或動怒這件事0分代表完全沒有，1分代表輕微，2分代表中等，3分代表厲害，4分代表非常厲害。你覺得你會給自己幾分?"],
-    ["那你覺得心情0到4分，0分代表完全沒有心情不好，4分代心情總是很差，你會給自己幾分?"],
+    ["那你覺得心情0到4分，0分代表沒有心情不好，4分代表心情總是很差，你會給自己幾分?"],
     ["那你覺得比不上別人這件事0分代表完全沒有，1分代表輕微，2分代表中等，3分代表厲害，4分代表非常厲害。你覺得你會給自己幾分?"],
     ["所以對於自殺的想法，你會給到自己幾分? 0分代表完全沒有想法，1分代表輕微，2分代表中等，3分代表厲害，4分代表非常厲害。"]
 ]
@@ -394,13 +393,13 @@ def query_news():
     if userInput == "":
         return  getReply(session["user"]["account"], session["user"]["tts"], "請輸入文字")
     userCkip = json.loads(req.post("http://140.116.245.157:2001", data={"data":userInput, "token":TOKEN}).text) # json 格式
-    print("preStep: " + str(session["user"]["preStep"]))
+    # print("preStep: " + str(session["user"]["preStep"]))
     if session["user"]["nowTimes"] == session["user"]["askingTimes"][session["user"]["preStep"]]:
         session["user"]["nowTimes"] = 0
         session["user"]["isFinishedQuestions"][session["user"]["preStep"]] = True  
     nowQuestion = detectSentenceType(userCkip["ws"][0])
     eventId = detectEvent(userInput)
-    print("eventId: " + str(eventId))
+    # print("eventId: " + str(eventId))
     if eventId != None and (session["user"]["isFinishedQuestions"]["event1"] == False or session["user"]["isFinishedQuestions"]["event2"] == False or session["user"]["isFinishedQuestions"]["event3"] == False):
         if session["user"]["isFinishedQuestions"]["event1"] == False:
             session["user"]["potentialEvents"].append(eventId)
@@ -423,13 +422,13 @@ def query_news():
         session.modified = True
         return getReply(session["user"]["account"], session["user"]["tts"], othersSentences[2][0])
     
-    print("nowQuestion: " + str(nowQuestion))
+    # print("nowQuestion: " + str(nowQuestion))
 
     symptomsList = detectSymptom(userInput)
-    print("symptomsList: " + str(symptomsList))
+    # print("symptomsList: " + str(symptomsList))
 
     basicSentencesId = int(nowQuestion[1:])-1
-    print("basicSentencesId: " + str(basicSentencesId + 1))
+    # print("basicSentencesId: " + str(basicSentencesId + 1))
 
     if session["user"]["isFinishedQuestions"][session["user"]["preStep"]]:
         session["user"]["nowTimes"] += 1
@@ -470,7 +469,7 @@ def query_news():
 
 if __name__ == '__main__':
 
-    app.run(host='127.0.0.1', port='8888',debug=True)
+    app.run(host='127.0.0.1', port='8888', debug=True, ssl_context='adhoc')
     
     
 

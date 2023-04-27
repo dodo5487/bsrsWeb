@@ -14,8 +14,14 @@ if (navigator.mediaDevices.getUserMedia) {
         if (mediaRecorder.state === "recording") {
           mediaRecorder.stop();
           recordBtn.textContent = "record";
+          recordBtn.blur();
+          inputArea.focus();
           console.log("錄音結束");
         } else {
+          if (app.audio.duration > 0 && !app.audio.paused){
+            console.log("======在播放中=====");
+            app.audio.pause();
+          }
           mediaRecorder.start();
           console.log("錄音中...");
           recordBtn.textContent = "stop";
@@ -54,5 +60,5 @@ if (navigator.mediaDevices.getUserMedia) {
     }
   );
 } else {
-  console.error("浏览器不支持 getUserMedia");
+  console.error("不支持 getUserMedia");
 }
