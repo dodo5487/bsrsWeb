@@ -306,6 +306,9 @@ def clearCacheFile():
     except Exception as e:
         print(e)
 
+def scoring(text):
+    pass
+
 
 
     
