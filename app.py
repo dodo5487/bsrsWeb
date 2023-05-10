@@ -260,9 +260,9 @@ def getReply(account, sessionTts, reply, popup = "0", preStepWord = ""):
         "preStep": preStepWord
         }
     elif sessionTts == "1":
-        tts_client = hts_synthesis_client.TTSClient()
-        tts_client.set_language(language="chinese", model="M60")
-        ttsPath = tts_client.askForService(data = reply, dir_path= dirPath, file_name = datetime.now().strftime("%H%M%S") + ".wav")
+        tts_client = hts_synthesis_client.TTSCrossLanguage()
+        tts_client.set_language(language="zh",speaker="UDN")
+        ttsPath = tts_client.askForService(text = reply, dir_path= dirPath, file_name = datetime.now().strftime("%H%M%S") + ".wav")
         return  {
         "isUser": False,
         "isText": True,
@@ -308,14 +308,12 @@ def clearCacheFile():
 
 def scoring(text):
     pass
-
-
-
     
 
 app = Flask(__name__,
         static_folder="static", # 放置靜態物件的名稱
         static_url_path="/static",)
+
 CORS(app)
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=10)
 app.config['UPLOAD_FOLDER'] = "./static/stt"
