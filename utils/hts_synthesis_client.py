@@ -11,7 +11,7 @@ import struct
 import os
 from datetime import datetime
 
-class TTSClient:
+class TTSClient: # for taiwanese
     def __init__(self):
         self.host = "140.116.245.157"
 
@@ -104,3 +104,88 @@ class TTSClient:
     # tts_client = TTSClient()
     # tts_client.set_language(language="taiwanese_sandhi", model="M12")
     # tts_client.askForService(data = "蘋果", file_path="./static/tts/gg" ,file_name= "output.wav")
+
+class TTSCrossLanguage: # for Chinese 
+
+    def __init__(self):
+        self.__host = "140.116.245.147"
+        self.__port = 10000
+        self.__token = "mi2stts"
+
+    def askForService(self, text:str, dir_path: str , file_name: str = datetime.now().strftime("%H%M%S") + ".wav"):
+        '''
+        Ask cross language synthesis server.
+        Params:
+            text        :(str) Text to be synthesized. 
+        '''
+        if not len(text):
+            raise ValueError ("Length of text must be bigger than zero")
+        
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((self.__host, self.__port))
+            msg = bytes(self.__token + "@@@" + text + '@@@' + self.__speaker + '@@@'+ self.__language, "utf-8")
+            msg = struct.pack(">I", len(msg)) + msg
+            sock.sendall(msg)
+            
+            with open(dir_path + "/" + file_name,'wb') as f:
+                while True:
+                    l = sock.recv(8192)
+                    if not l: 
+                        break
+                    f.write(l)
+            
+            print("File received complete")
+            return dir_path + "/" + file_name
+        
+        except Exception as e:
+            print(e)
+        
+        finally:
+            sock.close()
+
+    def set_language(self, language:str, speaker:str):
+        '''
+        Params:
+            language    :(str) Language to be synthesized, "tw" is Taiwanese or "zh" is Chinese or "en" is English.
+            speaker     :(str) Target speaker to be synthesized.
+        '''
+        self.__language = language
+        if self.__language not in ['tw', 'zh', 'en']:
+            raise ValueError('Language must be "tw" or "zh" or "en".')
+        
+        if speaker:
+            self.__speaker = speaker
+        
+        elif self.__language == 'tw':
+            self.__speaker = 'F64'
+        
+        elif self.__language == 'zh':
+            self.__speaker = 'F101'
+
+        elif self.__language == 'en':
+            self.__speaker = 'en10'
+
+# if __name__=='__main__':
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--text', type=str, default='Today is Friday，要去台南走走', help='Text to be synthesized.')
+
+#     parser.add_argument('--language', 
+#                         type=str, 
+#                         default='tw',
+#                         choices=['tw', 'zh', 'en'], 
+#                         help='Language to be synthesized, "tw" is Taiwanese, "zh" is Chinese or "en" is English.')
+    
+#     parser.add_argument('--speaker',
+#                         type=str, 
+#                         default='UDN', 
+#                         choices=['F06', 'F07', 'F26', 'F52', 'F53', 'F64', 'F68',     # Taiwanese speaker
+#                                  'F100','F101','F102','F103','F106','UDN',            # Chinese speaker
+#                                  'en7', 'en9', 'en10','en11','en14','en16','en18'],   # English speaker
+#                         help='Target speaker to be synthesized.')
+#     args = parser.parse_args()
+    
+#     tts_client = TTSCrossLanguage()
+#     tts_client.set_language(language=args.language, speaker=args.speaker)
+#     tts_client.askForService(args.text)
+
