@@ -10,11 +10,64 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>NCKU MI2S</title>
+    
 </head>
 <body>
     <div style="height: 100vh;" class="container-fulid d-flex flex-column align-items-center justify-content-center">
+        <h1 id="summaryText" style="margin: 70px;"></h1>
+        
+
+        <div style="margin: 50px;" class="container-fluid d-flex flex-row align-items-center justify-content-around">
+            <div class="container-fluid d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                <h4>潛在事件: </h4>
+                <ol id="events"></ol>
+            </div>
+            <div class="container-fluid d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                <h4>潛在症狀: </h4>
+                <ol id="symptoms"></ol>
+            </div>
+        </div>
+        
+        
         <h3 class="m-5">感謝您的作答，請按以下按鈕重新作答。</h3>
         <button type="button" class="btn btn-primary" onclick="javascript:location.href='/'">開始填答</button>
     </div>
+    <script>
+        let info = {{ summary | tojson | safe }};
+        let q6Score = info['q6Score'];
+        let score = info['score'];
+        let summaryText = document.getElementById('summaryText');
+        let events = info['events'];
+        let symptoms = info['symptoms'];
+
+        // let events = ["作惡夢","錢的問題"]
+        // let symptoms = [["頭痛","頭暈","失眠"],[],[],[],[],[]]
+
+        if (q6Score >= 2 || score >= 15) {
+            summaryText.style.color = 'red';
+        } else if (score >= 10 && score < 15) {
+            summaryText.style.color = 'orange';
+        } else if(score >5 && score < 10) {
+            summaryText.style.color = 'yellow';
+        } else {
+            summaryText.style.color = 'green';
+        }
+        summaryText.innerHTML = info['summaryText'];
+
+        for (let i = 0; i < events.length; i++) {
+            let event = document.createElement('li');
+            event.innerHTML = events[i];
+            document.getElementById('events').appendChild(event);
+        }
+
+        for (let i = 0; i < symptoms.length; i++) {
+            for (let j = 0; j < symptoms[i].length; j++) {
+                let symptom = document.createElement('li');
+                symptom.innerHTML = symptoms[i][j];
+                document.getElementById('symptoms').appendChild(symptom);
+            }
+        }
+    </script>
 </body>
+
 </html>

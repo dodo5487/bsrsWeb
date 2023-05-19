@@ -10,7 +10,6 @@ import glob
 import moviepy.editor as moviepy
 
 
-
 othersSentences = [
     ["您好，這裡是輔助診斷聊天機器人。等一下會詢問一些問題，請你回想近一個禮拜的狀況，並請你以直覺回答就可以了"],
 
@@ -101,7 +100,15 @@ questionTypeKeywords = [
             ["專心","決定"]
             ]
 
+symptomKeywordsList = [['寢食難安', '健忘', '記憶混亂', '記憶困難', '記憶力變差', '記憶力減退', '注意力渙散', '精神疲乏', '失眠', '晚睡', '多眠', '早醒', '無法入睡', '嗜睡', '睡的少'],
+                       ['不安', '不踏實', '不寒而慄', '掙脫不了', '想逃', '緊張兮兮', '膽怯', '瘋狂', '膽戰心驚', '發怵', '害怕', '驚嚇', '恐怖', '恐懼', '受驚', '心有餘悸', '羞愧', '慚愧', '丟臉', '丟人', '害羞', '可恥', '虧心', '愧疚', '難堪', '難看', '怕羞', '羞恥', '羞辱', '無所適從', '衝動', '激動', '緊張', '惶惑', '驚駭', '驚恐', '懼怕', '畏懼', '畏怯', '心驚膽戰', '心驚肉跳', '毛咕', '毛骨悚然', '失色', '失魂落魄', '生怕', '生恐', '屁滾尿流', '忌憚', '怯場', '杯弓蛇影', '畏縮', '風聲鶴唳', '望而生畏', '喪膽', '惶恐', '惶惶', '提心吊膽', '猶有餘悸', '發毛', '虛驚', '聞風喪膽', '魂不附體', '魂飛魄散', '談虎色變', '戰戰兢兢', '擔驚受怕', '懸心弔膽', '懸心吊膽', '懼色', '驚愕', '驚惶', '驚惶失措', '驚慌', '驚慌失措', '驚魂', '驚魂不定', '卑怯', '怯生', '怯生生', '怯弱', '怯懦', '怕生', '柔弱', '畏首畏尾', '畏葸', '畏葸不前', '苟且偷生', '苟且偷安', '脆弱', '婆婆媽媽', '貪生怕死', '軟弱', '愚懦', '懦弱', '縮手縮腳', '縮頭縮腳', '膽小', '膽小如鼠', '膽小怕事', '膽寒', '膽虛', '薄弱', '可怖', '可怕', '駭人聽聞', '嚇人', '嚇死', '觸目驚心', '入魔', '耿耿', '做賊心虛', '庸人自擾', '掛心', '掛慮', '牽心', '惴惴不安', '惶惶不安', '揪心', '焦慮不安', '焦慮', '駭異', '駭然', '戒心', '惕厲', '警戒', '鑑戒', '半信半疑', '生疑', '多心', '多疑', '存疑', '狐疑', '起疑', '將信將疑', '猜疑', '置疑', '疑心', '疑神疑鬼', '疑問', '質疑', '闕疑'],
+                       ['不快', '不爽', '不平', '不忿', '不順心', '不耐煩', '不滿', '不知所措', '自作自受', '心浮氣躁', '不要煩我', '任性', '真煩', '很煩', '煩人', '馬的', '媽的', '靠北', '哭霸', '哭爸', '哭腰', '靠腰', '哭么', '靠么', '發脾氣', '飆髒話', '討厭鬼', '怒罵', '責備', '打擊', '罵', '一肚子火', '王八蛋', '死不完', '你他媽', '我他媽', '他媽的', '他馬的', '操你媽', '操他媽', '去你媽', '幹你娘', '幹恁娘', '幹拎娘', '幹您娘', '幹林娘', '乾林良', '沈重', '辛苦', '有病', '煩死', '心煩氣躁', '自以為是', '憤慨', '憤怒', '惱火', '氣不過', '氣不忿', '氣憤', '痛苦', '無所謂', '怨恨', '仇恨', '敵視', '敵意', '妒忌', '嫉妒', '反感', '可恨', '可惡', '厭惡', '憎恨', '受傷', '煩悶', '難受', '心煩', '厭煩', '冷血', '著急', '浮躁', '急切', '急躁', '焦急', '焦慮', '心急', '心急如焚', '心切', '心慌', '發慌', '恐慌', '心慌意亂', '懊悔', '悔悟', '懺悔', '後悔', '抱歉', '過意不去', '自私', '急促', '感傷', '內疚', '吃驚', '驚訝', '震驚', '警惕', '疑惑', '懷疑', '可疑', '困惑', '迷茫', '為難', '狂亂', '氣急敗壞', '無奈', '心虛', '煩躁', '苦悶', '苦惱', '納悶', '厭倦', '憤激', '惱怒', '激憤', '氣惱', '盛怒', '悻悻', '震怒', '抱恨', '可憎', '痛恨', '痛惡', '嫌怨', '嫌惡', '嫌隙', '嫌憎', '憎惡', '焦心', '焦躁', '焦灼', '情急', '心焦', '煩亂', '祈求', '紛擾', '如坐針氈', '抱愧', '害臊', '愧恨', '悔恨', '失悔', '痛悔', '追悔', '自怨自艾', '負疚', '歉疚', '詫異', '愕然', '怪訝', '駭怪', '驚詫', '驚異', '迷惑', '迷惘', '彷徨', '疑忌', '哀憐', '憐憫', '憐惜', '痛惜', '掛念', '牽腸掛肚', '眷眷', '眷戀', '渴慕', '貪戀', '鄙視', '鄙夷', '侮蔑', '失意', '懊喪', '抱憾', '悵悵', '惆悵', '落魄', '惘然', '孤寂', '落寞', '落莫', '消魂', '銷魂', '哀思', '哀怨', '悲憤', '悲鬱', '悵恨', '悵惘', '愁苦', '仇怨', '憤恨', '憤懣', '感憤', '戒懼', '驚疑', '敬畏', '愧痛', '悶倦', '惱恨', '惱人', '危懼', '畏忌', '銜恨', '羞憤', '疑懼', '疑慮', '憂煩', '憂憤', '憂懼', '憂悶', '怨憤', '厭棄', '解恨', '發飆', '七竅生煙', '上火', '大發雷霆', '心頭火起', '火冒三丈', '令人髮指', '生氣', '光火', '腦羞成怒', '含怒', '狂怒', '冒火', '勃然大怒', '怒不可遏', '怒沖沖', '怒髮衝冠', '面有慍色', '氣沖沖', '氣呼呼', '動火', '動肝火', '動怒', '動氣', '悻悻然', '悻然', '掛火', '掛氣', '發怒', '發狠', '感忿', '惹氣', '慍怒', '義憤填膺', '嗔怒', '憤然', '憤憤', '暴跳如雷', '激怒', '觸怒', '怏怏', '怨聲載道', '仇隙', '切骨之仇', '民怨', '夙嫌', '幽怨', '怨毒', '怨氣', '冤仇', '恩怨', '宿怨', '深仇大恨', '惡意', '惡感', '悶氣', '睚眥之怨', '敵愾', '積怨', '切齒痛恨', '含恨', '抱恨終身', '咬牙切齒', '怨尤', '怨艾', '怨望', '恨入骨髓', '恨之入骨', '記恨', '恚恨', '積掰', '機掰', '雞掰', '深惡痛絕', '飲恨', '嫉恨', '閉嘴', '懷恨', '臭嘴', '吃醋', '報應', '打嘴砲', '拍馬屁', '妒火中燒', '死八婆', '忌克', '忌妒', '倒楣', '忌刻', '忌恨', '眼紅', '嫉賢妒能', '討嫌', '絮煩', '該死', '作嘔', '嫌棄', '膩味', '膩煩', '心焦如焚', '火燒火燎', '抓耳撓腮', '性急', '急赤白臉', '起急', '干急', '乾瞪眼', '發急', '搓手頓腳', '毛躁', '坐立不安', '急性子', '狷急', '粗暴', '暴躁', '褊急', '操之過急', '操切', '手忙腳亂', '手足無措', '失措', '周章', '倉皇', '倉皇失措', '張皇', '著慌', '慌神', '慌張', '慌亂', '羞赧', '羞慚', '赧然', '赧顏', '腆然', '腆顏', '仗勢欺人', '吐剛茹柔', '污辱', '作踐', '折辱', '侮辱', '玷污', '玷辱', '虐待', '凌虐', '凌辱', '凌轢', '辱沒', '欺人太甚', '欺生', '欺侮', '欺負', '欺凌', '欺壓', '摧殘', '輕侮', '踐踏', '蹂躪', '糟蹋', '褻瀆', '找事', '找茬', '找碴', '過不去', '難為', '利用', '陷害', '公憤', '民憤', '私憤', '幽憤', '義憤', '鬱憤'],
+                       ['幹', '不開心', '不高興', '不快樂', '不值得', '不是味兒', '不是滋味', '強顏歡笑', '對不起', '沒心', '捨不得', '膚淺', '爛透', '承受不了', '承受不住', '受不了', '受不瞭', '受不暸', '受不鳥', '喘不過氣', '莫名', '假面', '受夠', '哭訴', '空虛', '空洞', '很糟', '唉', '挫折', '煎熬', '失控', '做不到', '熬不住', '自己扛', '蠢爆了', '離我遠去', '好傻', '很傻', '一無所有', '無言以對', '無言', '走投無路', '走頭無路', '無路可走', '冷嘲熱諷', '幸災樂禍', '遍體麟傷', '悲從中來', '假惺惺', '自以為', '諷刺', '殘忍', '拿走', '折磨', '悲哀', '悲傷', '沉痛', '傷感', '傷心', '痛心', '心酸', '討厭', '窩囊', '憂愁', '擔心', '擔憂', '發愁', '犯愁', '憂慮', '壓抑', '鬱悶', '自卑', '無能感', '委屈', '抱屈', '冤枉', '可憐', '假裝', '困住', '可惜', '惋惜', '心疼', '思念', '懷念', '牽掛', '想念', '輕蔑', '藐視', '蔑視', '輕視', '失望', '悲觀', '沮喪', '茫然', '失落', '失落感', '不知不覺', '奢望', '無望', '心寒', '孤獨', '孤單', '孤立', '寂寞', '低落', '低沉', '消沉', '心灰意懶', '心灰意冷', '沉重', '沉甸甸', '無聊', '沉思', '解氣', '惱羞成怒', '不切實際', '袖手旁觀', '氣餒', '消氣', '喪氣', '掃興', '洩勁', '悲苦', '悲酸', '悲辛', '哀傷', '哀戚', '哀痛', '悲愴', '慘苦', '苦澀', '淒慘', '傷神', '酸楚', '痛心疾首', '辛酸', '誠惶誠恐', '寒心', '熬心', '懊惱', '憋悶', '憋氣', '煩擾', '糟心', '愁悶', '窮愁', '殷憂', '沉鬱', '陰鬱', '索然無味', '黯淡', '暗淡', '頹廢', '頹靡', '頹喪', '頹唐', '委靡', '彆扭', '遺憾', '心如刀割', '生不如死', '如喪考妣', '肝腸寸斷', '兔死狐悲', '哀哀', '哀毀骨立', '苦痛', '絕不', '淒切', '淒涼', '淒惻', '淒愴', '悲切', '悲慼', '悲痛', '悲愁', '悲慟', '悲慟不已', '破碎', '椎心', '椎心泣血', '痛不欲生', '痛切', '痛定思痛', '傷心欲絕', '無助', '傷悲', '傷痛', '腸斷', '慘然', '慘痛', '酸辛', '樂極生悲', '斷腸', '難過', '亡魂喪膽', '大驚失色', '沉悶', '悶悶不樂', '悶悶的', '悶悶', '愁眉苦臉', '煩惱', '窩愁', '鬱悒', '鬱悒寡歡', '鬱鬱寡歡', '人心惶惶', '六神無主', '日坐愁城', '多愁善感', '作賊心虛', '杞人憂天', '芒刺在背', '忐忑', '哀愁', '愁腸百結', '憂心', '憂心如焚', '憂心忡忡', '憂悒', '憂戚', '憂憤成疾', '憂鬱成疾', '懸心', '顧慮', '鬱結', '鬱積', '束縛', '牢籠', '拘謹', '拘束', '枷鎖', '桎梏', '強壓', '牽制', '牽掣', '壓制', '檢束', '關礙', '自抑', '自製', '自持', '克制', '忍受', '忍耐', '忍氣吞聲', '按捺', '容忍', '隱忍', '叫屈', '含屈而終', '受屈', '抱屈含冤', '暗暗叫屈', '窩氣', '自悔', '悔不當初', '悔之已晚', '悔之無及', '追悔莫及', '嗟悔', '愧悔', '噬臍莫及', '翻悔', '悔改', '悔罪', '悔過', '覺悟', '同病相憐', '其情可憫', '哀矜', '肉痛', '歎惋', '念念不忘', '念舊', '思鄉', '思慕', '思親', '相思', '記掛', '惦念', '惦記', '牽念', '眷念', '朝思暮想', '渴想', '軫念', '感念', '感懷', '懷古', '懷想', '懷舊', '懷戀', '顧念', '向隅', '死心', '事與願違', '垂頭喪氣', '絕望', '萬念俱灰', '廢然', '心如死灰', '意懶心灰', '厭世', '聽天由命', '一籌莫展', '力不從心', '心有餘而力不足', '心餘力絀', '巧婦難為無米之炊', '坐以待斃', '束手待斃', '束手無策', '沒奈何', '沒門兒', '沒轍', '奈何', '孤掌難鳴', '怎奈', '迫不得已', '望洋興歎', '存亡', '懶散', '沒路用', '無可奈何', '無計可施', '無能為力', '無能', '傷口', '愛莫能助', '萬不得已', '萬般無奈', '遠水救不了近火', '獨木不成林', '獨木難支', '黔驢技窮', '鞭長莫及', '人情淡薄', '世態炎涼', '冰冷', '冷冰冰', '冷言冷語', '冷若冰霜', '冷淡', '冷漠', '冷漠無情', '冷酷', '冷酷無情', '神情淡漠', '淡薄', '無動於衷', '無情', '漠不關心', '漠然置之', '沖沖', '怒氣沖沖', '灰心', '灰溜溜', '沒精打采', '洩氣', '氣短', '消極', '得過且過', '敗興', '被動', '無精打采', '萎靡', '傷氣', '意志消沉', '意興闌珊', '槁木死灰', '頹然', '懨懨', '黯然', '黯然神傷', '沉濁', '深沉', '悶沉沉', '悶聲悶氣', '濃濁', '迷漫', '漠漠', '漫天', '瀰漫', '靉靆', '入骨', '沉沉', '刻骨', '徹骨', '烏雲密佈', '陰暗', '陰冷', '陰沉', '陰霾', '汍瀾', '吞聲', '呼天搶地', '抽泣', '抽咽', '泣不成聲', '泫然', '哀泣', '哀號', '淚', '流淚', '哭天抹淚', '哭泣', '哭哭啼啼', '哭鼻子', '哭嚎', '哽咽', '唏噓', '涕泣', '涕泗滂沱', '涕淚俱下', '鬼哭狼嚎', '乾號', '啜泣', '淚水', '淚如雨下', '淚如泉湧', '淚汪汪', '淚花', '淚流滿面', '淚珠', '淚液', '眼淚', '掉眼淚', '啼泣', '啼哭', '悲泣', '悲咽', '悲哽', '揮淚', '痛哭', '痛哭流涕', '飲泣', '嗚咽', '號哭', '慟哭', '漣洏', '漣漣', '撲簌', '撕心裂肺', '潸然', '潸潸', '熱淚盈眶', '嚎啕', '嚎啕大哭', '簌簌', '聲淚俱下', '灑淚', '心病', '鄉愁', '愁思', '愁腸', '愁緒', '憂思', '隱憂', '離愁', '打馬虎眼', '悵然', '惘然若失', '惝怳', '惝恍', '由不得', '忍不住', '忍無可忍', '抒情', '抒發', '宣洩', '洩恨', '洩憤', '發抒', '發洩', '禁不住', '禁不起', '縱情', '難忍', '難耐', '灰暗', '昏天黑地', '昏沉', '昏黑', '昏暗', '幽幽', '幽暗', '暗淡無光', '慘淡', '心情不好'],
+                       ['不懂', '不詳', '不值一提', '不屑', '不屑一顧', '不堪一擊', '不起眼', '配不上', '拖累', '羞怯', '憂傷', '淡漠', '漠然', '漠視', '自慚形穢', '自餒', '自滿', '自恃', '無地自容', '羞人', '羞澀', '妄自菲薄', '自愧弗如', '自慚', '自輕自賤', '自暴自棄', '一事無成', '小看', '小視', '小瞧', '白眼', '歧視', '看不起', '看輕', '無足輕重', '背叛', '無視', '菲薄', '視如糞土', '讓步', '睇小', '嗤之以鼻', '微不足道', '睥睨', '鄙棄', '鄙薄', '賤視', '瞧不起', '差強人意', '隨便', '如饑似渴', '大失所望', '自欺欺人', '命運', '噩夢', '失敗', '累贅', '放棄', '犧牲', '頂嘴', '多餘'],
+                       ['想不開', '勒死', '掛掉', '自殺', '跳樓', '跳海', '上吊', '尋死', '輕生', '消失', '往生', '永別', '遺物', '生死', '天堂', '結束', '燒炭', '割腕', '做傻事', '想死', '尋短', '解脫', '不想活']
+                       ]
 
+eventsList = ['不想出門', '不想上班', '不想說話', '不想講話', '不想看醫生', '不想回家', '不想上學', '不想回去', '不想吃飯', '不想讀書', '不想上課', '不想起床', '不想念書', '不想工作', '不想要出門', '不想要念書', '不想吃藥', '不想吃東西', '不想接觸人群', '不想找工作', '不想做事', '不想要吃藥', '不想看電視', '不想接電話', '不想跟人說話', '不想跟人相處', '不想跟人講話', '不想跟人聊天', '不想跟人交談', '不想跟人互動', '不想跟人出去', '課業的問題', '論文做不完', '學校的問題', '錢的負擔', '小孩的問題', '課業的事情', '課業的壓力', '異樣的眼光', '現實的落差', '父母的壓力', '高壓的狀態', '機車的老闆娘', '錢的問題', '被誤會', '被放鳥', '被狂操', '被死釘', '搞我', '傷害我', '騙我', '拋棄我', '推開我', '跟蹤我', '嘲諷我', '惹到我', '揶揄我', '圍剿我', '壓迫我', '凌虐我', '數落我', '不理我', '住院', '休學', '分手', '吵架', '辭職', '離婚', '離家', '熬夜', '爭吵', '作弊', '絕交', '經濟壓力', '工作噩夢', '愛恨情仇', '混蛋客人', '論文壓力', '酒鬼父親', '財務問題', '課業因素', '功課壓力', '腦殘老闆', '情愛糾葛', '課業問題', '身材問題', '社會現實', '鳥事', '感情犧牲品', '煩惱論文', '爸媽面子', '無法承受', '無法溝通', '無法錄取', '無法挽回', '對我說謊', '讓我哭', '對我發脾氣', '對我說教', '被拋棄', '被罵', '被打', '被欺負', '被開除', '被整死', '被傷害', '被念', '被騙', '被遺棄', '被羞辱', '被嘲弄', '給趕走', '被排斥', '被排擠', '被虐待', ',被吵醒', '受欺負', '被當掉', '被背叛', '被丟下', '被侷限', '被折騰', '受摧殘', '被強暴', '被恥笑', '被剝奪', '受折磨', '被壓抑', '被束縛', '被踐踏', '被綁死', '閱讀障礙', '接近人群', '做錯事情', '丟工作', '吊點滴', '辦不了貸款', '放棄論文', '拿掉孩子', '劈腿', '發病', '復發', '離職', '遲到', '發酒瘋', '酗酒', '失戀', '心碎', '心寒', '無家可歸', '肄業', '失業', '失調', '自作多情', '沒錢', '沒收入', '沒安全感', '沒朋友', '沒人緣', '沒有社交', '病情', '惡夢', '醫藥費', '完美主義', '重考', '閒言閒語', '家暴', '第三者']
 
 symptomTypeKeywords = [["睡不好","作惡夢","做惡夢","淺眠","早醒","易醒","失眠"],
                        ["緊張","不安","緊張不安","坐立難安","焦慮","恐懼","恐懼"],
@@ -187,25 +194,31 @@ def detectSentenceType(ws):
                         if session["user"]["isFinishedQuestions"][step] == False:
                             return step
                         
-def detectSymptom(inputSentence):
-    
-    symptomsList = [ [] for _ in range(6)]
-    for symptomTypeId in range(len(symptomTypeKeywords)):
-        for symptom in symptomTypeKeywords[symptomTypeId]:
-            if symptom in inputSentence and symptom not in symptomsList[symptomTypeId]:
-                symptomsList[symptomTypeId].append(symptom)
-            if symptom in inputSentence and symptom not in session["user"]["potentialSymptoms"][symptomTypeId]:
-                session["user"]["potentialSymptoms"][symptomTypeId].append(symptom)
-    return symptomsList
+def detectSymptom(text,preStep):
+    if preStep in ["q1","q2","q3","q4","q5","q6"]:
+        index = int(preStep[-1]) - 1
+        for symptom in symptomKeywordsList[index]:
+            if symptom in text and symptom not in session["user"]["potentialSymptoms"][index]:
+                print(symptom)
+                session["user"]["potentialSymptoms"][index].append(symptom)
+                session.modified = True
+            
+def detectEvent(text):
+    for event in eventsList:
+        if event in text and event not in session["user"]["potentialEvents"]:
+            print(event)
+            session["user"]["potentialEvents"].append(event)
+            session.modified = True
 
-def detectEvent(inputSentence):
+
+def detectEventType(inputSentence):
     for index in range(len(eventTypeKeywords)):
         for event in eventTypeKeywords[index]:
             if event in inputSentence:
                 return index
     return None
 
-def getNewUserInfo(account , tts , stt):
+def getNewUserInfo(account , tts , stt): # new user's session setting
 
     steps = sorted(["q" + str(i) for i in range(1,12)],key= lambda k : random.random())
     steps.pop(steps.index("q4"))
@@ -213,6 +226,7 @@ def getNewUserInfo(account , tts , stt):
     steps.insert(0,"q4")
     steps.append("q6")
     steps.append("end")
+    score = [-1 for _ in range(6)]
 
     return { 
              "account" : account,
@@ -222,7 +236,9 @@ def getNewUserInfo(account , tts , stt):
              "askingTimes" : {"event1" : 1 ,"event2": 1,"event3": 1,"chit" : 1 ,"q1": 2 ,"q2": 2 ,"q3": 2 ,"q4": 2 ,"q5": 2 ,"q6": 2 ,"q7": 1 ,"q8": 1 ,"q9": 1 ,"q10": 1 ,"q11": 1 ,"end": 1 },
              "potentialSymptoms" : [ [] for _ in range(6) ],
              "potentialEvents" : [],
+             "potentialEventsId" : [],
              "steps" : steps,
+             "score" : score,
              "preStep" : "chit",
              "nowTimes" : 1
             }
@@ -247,13 +263,15 @@ def getPreStepWord(preStep):
     elif preStep == "q6":
         return "對於自殺念頭的問題，請以拉霸的方式來表示你對於這個問題的嚴重程度。"
 
-def getReply(account, sessionTts, reply, popup = "0", preStepWord = ""):
+def getReply(nowQuestion, lastQuestion, account, sessionTts, reply, popup = "0", preStepWord = ""):
 
     dirPath = f"./static/tts/{account}"
     if sessionTts == "0":
         return  {
         "isUser": False,
         "isText": True,
+        "nowQuestion": nowQuestion,
+        "lastQuestion": lastQuestion,
         "reply": reply,
         "ttsPath": "",
         "popup": popup ,
@@ -266,6 +284,8 @@ def getReply(account, sessionTts, reply, popup = "0", preStepWord = ""):
         return  {
         "isUser": False,
         "isText": True,
+        "nowQuestion": nowQuestion,
+        "lastQuestion": lastQuestion,
         "reply": reply,
         "ttsPath" : ttsPath,
         "popup": popup ,
@@ -278,12 +298,13 @@ def getReply(account, sessionTts, reply, popup = "0", preStepWord = ""):
         return  {
         "isUser": False,
         "isText": True,
+        "nowQuestion": nowQuestion,
+        "lastQuestion": lastQuestion,
         "reply": reply,
         "ttsPath" : ttsPath,
         "popup": popup,
         "preStep": preStepWord
         }
-
 
 def clearCacheFile():
     
@@ -306,9 +327,21 @@ def clearCacheFile():
     except Exception as e:
         print(e)
 
-def scoring(text):
-    pass
-    
+def scoring(text): # detect the text's score from 0 to 4
+    score = -1
+    scoringWords = [
+    ["0","沒有","零","零分","0分"],
+    ["1","很少","一","一分","1分"],
+    ["2","有時候","二","兩分","二分","2分"],
+    ["3","經常","三","三分","3分"],
+    ["4","幾乎每天","四","四分","4分"]]
+    for i in range(len(scoringWords)):
+        for j in range(len(scoringWords[i])):
+            if scoringWords[i][j] in text:
+                return i
+            
+    # TODO : 考慮到多種回答的情況
+    return score
 
 app = Flask(__name__,
         static_folder="static", # 放置靜態物件的名稱
@@ -343,6 +376,10 @@ def login():
 def chatbot():
     return render_template('index.html')
 
+@app.route('/feedback' , methods = ["POST"])
+def feedback():
+    return "ok"
+
 @app.route('/upload',  methods=['POST'])
 def upload_data():
     data = request.get_json()
@@ -353,8 +390,34 @@ def upload_data():
 
 @app.route('/thank')
 def thank():
-    clearCacheFile()
-    return render_template("thank.html")
+    summarySentencesList = [
+        "您的情緒狀況屬於正常範圍，表示身心適應狀況良好。",
+        "您屬於輕度情緒困擾，建議做好壓力管理, 找家人或朋友談談，抒發心情。",
+        "看起來您最近壓力指數有點高，屬於中度情緒困擾，建議尋求並接受心理專業諮詢。",
+        "看起來您最近壓力指數有點高，屬於重度情緒困擾，需要高度關懷，建議尋求專業輔導或精神科診療。",
+        "看起來您最近壓力指數有點高，建議尋求專業輔導或精神科治療。"
+        ]
+    # clearCacheFile()
+    scoreList = session["user"]["score"]
+    q6Score = int(scoreList[5])
+    score = 0
+    events = session["user"]["potentialEvents"]
+    symptoms = session["user"]["potentialSymptoms"]
+    for i in range(5):
+        score += int(scoreList[i])
+    
+    if q6Score >= 2:
+        summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[4], "events":events, "symptoms":symptoms}
+    elif score <= 5:
+        summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[0], "events":events, "symptoms":symptoms}
+    elif score >=6 and score <=9:
+        summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[1], "events":events, "symptoms":symptoms}
+    elif score >=10 and score <=14:
+        summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[2], "events":events, "symptoms":symptoms}
+    elif score >=15:
+        summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[3], "events":events, "symptoms":symptoms}
+    
+    return render_template("thank.html" , summary = summary)
 
 @app.route("/result", methods=["POST"])
 def result():
@@ -368,7 +431,6 @@ def result():
         os.mkdir(dirPath)
     audio_blob = request.files['data'] # <class 'werkzeug.datastructures.FileStorage'>
 
-    # TODO: is there any way to avoid saving wav file and read them again?
     fname = str(time.time())[:14]
     with open(f"{dirPath}/{fname}.webm", "wb") as _f:
         audio_blob.save(_f)
@@ -385,48 +447,64 @@ def result():
 
     return ""
  
+@app.route('/getSliderValue', methods=['POST'])
+def getSliderValue():
+    data = request.get_json()
+    sliderValue = data["sliderValue"]
+    lastQuestionIndex = int(data["lastQuestion"][-1])
+    # print("lastQuestionIndex: " + str(lastQuestionIndex))
+    # print("sliderValue: " + str(sliderValue))
+    session["user"]["score"][lastQuestionIndex - 1] = sliderValue
+    session.modified = True
+    return "ok"
 
 @app.route('/getReply', methods=['POST'])
 def query_news():
 
     data = request.get_json()
-    userInput = data["input_message"]   
+    userInput = data["input_message"]  
     if userInput == "":
-        return  getReply(session["user"]["account"], session["user"]["tts"], "請輸入文字")
+        return  getReply(None, None, session["user"]["account"], session["user"]["tts"], "請輸入文字")
     userCkip = json.loads(req.post("http://140.116.245.157:2001", data={"data":userInput, "token":TOKEN}).text) # json 格式
     # print("preStep: " + str(session["user"]["preStep"]))
     if session["user"]["nowTimes"] == session["user"]["askingTimes"][session["user"]["preStep"]]:
         session["user"]["nowTimes"] = 0
         session["user"]["isFinishedQuestions"][session["user"]["preStep"]] = True  
     nowQuestion = detectSentenceType(userCkip["ws"][0])
-    eventId = detectEvent(userInput)
+    eventId = detectEventType(userInput)
+
+    detectSymptom(userInput,session['user']['preStep']) 
+    detectEvent(userInput)
     # print("eventId: " + str(eventId))
     if eventId != None and (session["user"]["isFinishedQuestions"]["event1"] == False or session["user"]["isFinishedQuestions"]["event2"] == False or session["user"]["isFinishedQuestions"]["event3"] == False):
         if session["user"]["isFinishedQuestions"]["event1"] == False:
-            session["user"]["potentialEvents"].append(eventId)
+            session["user"]["potentialEventsId"].append(eventId)
             nowQuestion = "event1"
-        elif session["user"]["isFinishedQuestions"]["event2"] == False and eventId not in session["user"]["potentialEvents"]:
-            session["user"]["potentialEvents"].append(eventId)
+        elif session["user"]["isFinishedQuestions"]["event2"] == False and eventId not in session["user"]["potentialEventsId"]:
+            session["user"]["potentialEventsId"].append(eventId)
             nowQuestion = "event2"
-        elif session["user"]["isFinishedQuestions"]["event3"] == False and eventId not in session["user"]["potentialEvents"]:
-            session["user"]["potentialEvents"].append(eventId)
+        elif session["user"]["isFinishedQuestions"]["event3"] == False and eventId not in session["user"]["potentialEventsId"]:
+            session["user"]["potentialEventsId"].append(eventId)
             nowQuestion = "event3"
 
     if nowQuestion.startswith("event"):
         session["user"]["isFinishedQuestions"]["event" + nowQuestion[-1]] = True
         session.modified = True
-        return getReply(session["user"]["account"], session["user"]["tts"], eventSentences[eventId][0])
+        return getReply("event" + nowQuestion[-1], session["user"]["preStep"] ,session["user"]["account"], session["user"]["tts"], eventSentences[eventId][0])
     
     
     if nowQuestion == "end":
         session["user"]["isFinishedQuestions"]["end"] = True
         session.modified = True
-        return getReply(session["user"]["account"], session["user"]["tts"], othersSentences[2][0])
+        preStepWord = getPreStepWord(session["user"]["preStep"])
+        ps = session["user"]["preStep"]
+        if ps == "q1" or ps == "q2" or ps == "q3" or ps == "q4" or ps == "q5" or ps == "q6":
+            return getReply("end", ps, session["user"]["account"], session["user"]["tts"], othersSentences[2][0] ,"1", preStepWord)
+        else:
+            return getReply("end", session["user"]["preStep"], session["user"]["account"], session["user"]["tts"], othersSentences[2][0])
     
     # print("nowQuestion: " + str(nowQuestion))
 
-    symptomsList = detectSymptom(userInput)
-    # print("symptomsList: " + str(symptomsList))
 
     basicSentencesId = int(nowQuestion[1:])-1
     # print("basicSentencesId: " + str(basicSentencesId + 1))
@@ -442,29 +520,31 @@ def query_news():
         # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
         # print("================= IF =======================")
         if ps == "q1" or ps == "q2" or ps == "q3" or ps == "q4" or ps == "q5" or ps == "q6":
-            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)],"1",preStepWord)
+            return getReply(nowQuestion, ps, session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)],"1",preStepWord)
         else:
-            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)])
+            return getReply(nowQuestion, ps, session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords)-1)] + basicSentences[basicSentencesId][random.randint(0,3)])
     
     else:
         if session["user"]["nowTimes"] == 1:
             session["user"]["nowTimes"] += 1
+            ps = session["user"]["preStep"]
             # print("nowTimes: " + str(session["user"]["nowTimes"]))
             session["user"]["preStep"] = nowQuestion
             session.modified = True
             # print(session.get("user"))
             # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
             # print("==================ELSE IF======================")
-            return getReply(session["user"]["account"], session["user"]["tts"], intensitySentences[basicSentencesId][0])
+            return getReply(nowQuestion, ps, session["user"]["account"], session["user"]["tts"], intensitySentences[basicSentencesId][0])
 
         else:
             session["user"]["nowTimes"] += 1
+            ps = session["user"]["preStep"]
             # print("nowTimes: " + str(session["user"]["nowTimes"]))
             session["user"]["preStep"] = nowQuestion
             session.modified = True
             # print(session.get("user"))
             # print("isFinishedQuestions: " + str(session["user"]["isFinishedQuestions"]))
-            return getReply(session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords))] + basicSentences[basicSentencesId][random.randint(0,3)])
+            return getReply(nowQuestion, ps, session["user"]["account"], session["user"]["tts"], replyWords[random.randint(0,len(replyWords))] + basicSentences[basicSentencesId][random.randint(0,3)])
     
             
 

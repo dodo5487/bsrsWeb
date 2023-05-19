@@ -1,5 +1,36 @@
 const recordBtn = document.querySelector(".record-btn");
 const inputArea = document.getElementById("inputArea");
+const popup = document.getElementById("popup");
+const symptomtext = document.getElementById("symptomtext");
+const slider = document.getElementById("myRange");
+const sendMessage = document.getElementById("sendMessage");
+const recorder = document.getElementById("recorder");
+const nowQuestion = document.getElementById("nowQuestion");
+const lastQuestion = document.getElementById("lastQuestion");
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function openPopup(text) {
+  symptomtext.innerHTML = text;
+  sendMessage.setAttribute("disabled","disabled");
+  recorder.setAttribute("disabled","disabled");
+  inputArea.setAttribute("disabled","disabled");
+  popup.classList.add("open_popup");
+}
+
+function closePopup() {
+  app.getSliderValue();
+  slider.value = "2";
+  if (nowQuestion.value != "end"){
+    sendMessage.removeAttribute("disabled");
+    recorder.removeAttribute("disabled");
+    inputArea.removeAttribute("disabled"); 
+  }
+  popup.classList.remove("open_popup");
+}
+
 
 if (navigator.mediaDevices.getUserMedia) {
   var chunks = [];
@@ -19,7 +50,6 @@ if (navigator.mediaDevices.getUserMedia) {
           console.log("錄音結束");
         } else {
           if (app.audio.duration > 0 && !app.audio.paused){
-            console.log("======在播放中=====");
             app.audio.pause();
           }
           mediaRecorder.start();
