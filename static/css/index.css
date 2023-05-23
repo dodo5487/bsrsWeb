@@ -83,12 +83,13 @@ body {
 }
 
 .symptomtext-wrapper {
-    padding: 10px 0 0 0;
+    margin: 50px 0 0 0;
+    /* padding: 20px 0 0 0; */
     height: 150px;
 }
 
 .slider-wrapper {
-    width: 95%; /* Adjust the width as needed */
+    width: 88%; /* Adjust the width as needed */
     display: inline-block;
 }
 
@@ -113,15 +114,17 @@ body {
   }
 
 
-.intensityimg{
-    width: 98%;
-    height: 80px;
+.intensityimg {
+    width: 100%;
+    margin: 20px 0 20px 0;
+    font-size: 9vw;
     display: flex;
     justify-content: space-between;
 }
 
+
 .numbertext {
-    width: 95%; /* Adjust the width as needed */
+    width: 88%; /* Adjust the width as needed */
     font-size: 40px;
     display: flex;
     padding: 0 0 40px 0;

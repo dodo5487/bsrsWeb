@@ -10,4 +10,6 @@ def get_conceptnet_data(word,language='zh'):
     obj = requests.get(url).json()
     return obj
 
-print(get_conceptnet_data('狗'))
+print(type(get_conceptnet_data('狗')["edges"][0]))
+# with open("data.json", "w", encoding="utf-8") as f:
+#     f.write(str(get_conceptnet_data('狗')["edges"][0]))

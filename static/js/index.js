@@ -22,7 +22,7 @@ function openPopup(text) {
 
 function closePopup() {
   app.getSliderValue();
-  slider.value = "2";
+  slider.value = "20";
   if (nowQuestion.value != "end"){
     sendMessage.removeAttribute("disabled");
     recorder.removeAttribute("disabled");

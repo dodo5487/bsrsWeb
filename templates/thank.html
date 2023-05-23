@@ -14,22 +14,22 @@
 </head>
 <body>
     <div style="height: 100vh;" class="container-fulid d-flex flex-column align-items-center justify-content-center">
-        <h1 id="summaryText" style="margin: 70px;"></h1>
+        <h1 id="summaryText" style="margin: 70px 100px 70px 100px;"></h1>
         
 
         <div style="margin: 50px;" class="container-fluid d-flex flex-row align-items-center justify-content-around">
             <div class="container-fluid d-flex flex-column align-items-center justify-content-center flex-grow-1">
-                <h4>潛在事件: </h4>
-                <ol id="events"></ol>
+                <h3>您的潛在事件: </h3>
+                <ul id="events"></ul>
             </div>
             <div class="container-fluid d-flex flex-column align-items-center justify-content-center flex-grow-1">
-                <h4>潛在症狀: </h4>
-                <ol id="symptoms"></ol>
+                <h3>您的潛在症狀: </h3>
+                <ul id="symptoms"></ul>
             </div>
         </div>
         
         
-        <h3 class="m-5">感謝您的作答，請按以下按鈕重新作答。</h3>
+        <h5 class="m-5">感謝您的作答，請按以下按鈕重新作答。</h5>
         <button type="button" class="btn btn-primary" onclick="javascript:location.href='/'">開始填答</button>
     </div>
     <script>
@@ -40,8 +40,8 @@
         let events = info['events'];
         let symptoms = info['symptoms'];
 
-        // let events = ["作惡夢","錢的問題"]
-        // let symptoms = [["頭痛","頭暈","失眠"],[],[],[],[],[]]
+        // let events = ["學校的壓力","論文做不完"]
+        // let symptoms = [["想吐","頭痛","想哭"],[],[],[],[],[]]
 
         if (q6Score >= 2 || score >= 15) {
             summaryText.style.color = 'red';
@@ -55,16 +55,17 @@
         summaryText.innerHTML = info['summaryText'];
 
         for (let i = 0; i < events.length; i++) {
-            let event = document.createElement('li');
-            event.innerHTML = events[i];
+            let event = document.createElement('h4');
+            event.innerHTML = i+1 + ". " +  events[i];
             document.getElementById('events').appendChild(event);
         }
-
+        let index = 1;
         for (let i = 0; i < symptoms.length; i++) {
             for (let j = 0; j < symptoms[i].length; j++) {
-                let symptom = document.createElement('li');
-                symptom.innerHTML = symptoms[i][j];
+                let symptom = document.createElement('h4');
+                symptom.innerHTML = index + ". " +symptoms[i][j];
                 document.getElementById('symptoms').appendChild(symptom);
+                index++;
             }
         }
     </script>

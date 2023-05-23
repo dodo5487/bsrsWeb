@@ -244,10 +244,20 @@ def getNewUserInfo(account , tts , stt): # new user's session setting
             }
     
 def validLogin(account, password):
-    if account == "123" and password == "123":
+    if account == "guest1" and password == "guest1":
         return True
-    else: 
-        False
+    elif account == "guest2" and password == "guest2":
+        return True 
+    elif account == "guest3" and password == "guest3":
+        return True
+    elif account == "guest4" and password == "guest4":
+        return True
+    elif account == "guest5" and password == "guest5": 
+        return True
+    elif account == "456" and password == "456":
+        return True
+    else:
+        return False
 
 def getPreStepWord(preStep):
     if preStep == "q1":
@@ -399,12 +409,13 @@ def thank():
         ]
     # clearCacheFile()
     scoreList = session["user"]["score"]
-    q6Score = int(scoreList[5])
+    q6Score = round(int(scoreList[5]) / 10)
     score = 0
     events = session["user"]["potentialEvents"]
     symptoms = session["user"]["potentialSymptoms"]
     for i in range(5):
         score += int(scoreList[i])
+    score = round(score / 10)
     
     if q6Score >= 2:
         summary = {"q6Score":q6Score, "score": score, "summaryText":summarySentencesList[4], "events":events, "symptoms":symptoms}
@@ -473,7 +484,7 @@ def query_news():
     nowQuestion = detectSentenceType(userCkip["ws"][0])
     eventId = detectEventType(userInput)
 
-    detectSymptom(userInput,session['user']['preStep']) 
+    detectSymptom(userInput,session["user"]["preStep"]) 
     detectEvent(userInput)
     # print("eventId: " + str(eventId))
     if eventId != None and (session["user"]["isFinishedQuestions"]["event1"] == False or session["user"]["isFinishedQuestions"]["event2"] == False or session["user"]["isFinishedQuestions"]["event3"] == False):
@@ -551,6 +562,7 @@ def query_news():
 if __name__ == '__main__':
 
     app.run(host='127.0.0.1', port='8888', debug=True, ssl_context='adhoc')
+    # app.run(host='0.0.0.0', port='8888', debug=True, ssl_context=('./server.cert', 'server.key'))
     
     
 
