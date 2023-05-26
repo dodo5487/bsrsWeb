@@ -101,9 +101,9 @@ class TTSClient: # for taiwanese
     # tts_client = TTSClient()
     # tts_client.set_language(language=args.language, model=args.model)
     # tts_client.askForService(data = args.data, file_name=args.o)
-    # tts_client = TTSClient()
-    # tts_client.set_language(language="taiwanese_sandhi", model="M12")
-    # tts_client.askForService(data = "蘋果", file_path="./static/tts/gg" ,file_name= "output.wav")
+# tts_client = TTSClient()
+# tts_client.set_language(language="taiwanese_sandhi", model="M12")
+# tts_client.askForService(data = "我是阿拉伯石油小公主", dir_path="./static/tts" ,file_name= "output.wav")
 
 class TTSCrossLanguage: # for Chinese 
 
@@ -189,3 +189,6 @@ class TTSCrossLanguage: # for Chinese
 #     tts_client.set_language(language=args.language, speaker=args.speaker)
 #     tts_client.askForService(args.text)
 
+# tts_client = TTSCrossLanguage()
+# tts_client.set_language(language="tw", speaker="UDN")
+# tts_client.askForService(text = "我是阿拉伯石油小公主",dir_path="./static/tts" )

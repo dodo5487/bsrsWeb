@@ -30,7 +30,7 @@
                 <!-- 導覽列 -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-3">
                     <div class="container-fluid">
-                        <a class="navbar-brand" href="/">Bsrs-5 Chatbot</a>
+                        <a class="navbar-brand" href="/">Mental Health Chatbot</a>
                         <div>
                             <!-- <button type="button" class="btn btn-primary" onclick="openPopup()">測試</button> -->
                             <button type="button" class="btn btn-primary" onclick="javascript:location.href='/'">重新填寫</button>
@@ -104,11 +104,6 @@
                                 <p>😑</p>
                                 <p>😞</p>
                                 <p>😭</p>
-                                <!-- <p>😀</p>
-                                <p>😊</p>
-                                <p>😐</p>
-                                <p>😞</p>
-                                <p>😭</p> -->
                             </div>
                             <div class="slider-wrapper">
                                 <input type="range" min="0" max="40" value="20" class="slider" id="myRange">
@@ -181,7 +176,6 @@
     <!-- local js -->
     <script>
         
-
         let app = new Vue({
             el: "#app",
             data: {
@@ -191,12 +185,15 @@
                 is_done: 0,
                 tts_path: "",
                 audio: new Audio(),
+                lang: "0",
             },
-            created() {
+            async created() {
                 // setting
                 // this.check_confirm = confirm("仍在開發階段，任何言論皆不代表本實驗室立場");
                 // message
-                this.initMessange();
+                await this.initMessange();
+                await this.getLanguage();
+                this.initAudio();
             },
             methods: {
                 // messange
@@ -209,7 +206,7 @@
                     this.message_list.push({
                         "isUser": false,
                         "isText": true,
-                        "reply": "您好，這裡是輔助診斷聊天機器人。等一下會詢問一些問題，請你回想近一個禮拜的狀況，並請你以直覺回答就可以了 !",
+                        "reply": "您好，這裡是輔助診斷機器人。等一下會詢問一些問題，請你回想近一個禮拜的狀況，請你以直覺回答就可以了 !",
                     });
                     this.message_list.push({
                         "isUser": false,
@@ -217,7 +214,17 @@
                         "reply": "請問最近生活中有沒有遇到什麼困難?",
                     });
                 },
-
+                initAudio() {
+                    console.log("initAudio: " + this.lang);
+                    if(this.lang == "1"){
+                        this.audio = new Audio("./static/tts/zh.wav");
+                        this.audio.play();
+                    }
+                    else if(this.lang == "2"){
+                        this.audio = new Audio("./static/tts/tw.wav");
+                        this.audio.play();
+                    }
+                },
                 // send message
                 async sendMessage() {
                     await this.pushMessange();
@@ -309,6 +316,20 @@
                             this.scrollToEnd();
                         });
                 },
+                getLanguage() {
+                return new Promise((resolve, reject) => {
+                    axios
+                        .post('/getLanguage')
+                        .then((response) => {
+                            console.log("getLanguage: " + response.data);
+                            this.lang = response.data;
+                            resolve(); // 成功时解析 promise
+                        })
+                        .catch((error) => {
+                            reject(error); // 失败时拒绝 promise
+                        })
+                });
+            },
             },
         });
     </script>
